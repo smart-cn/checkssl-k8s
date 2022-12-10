@@ -20,4 +20,4 @@ echo "SSL certificates expiration dates for the cluster certificates:"
 for cert in $(find /etc/kubernetes/pki/ -name "*.crt" | sort); do echo "$cert:"; openssl x509 -in $cert -noout -startdate -enddate -checkend 0|   sed "s/Certificate will expire/ (EXPIRED\!)/g" |  sed "s/Certificate will not expire/ (OK)/g"; echo;  done
 echo "===="
 echo "SSL certificates expiration dates according to kubeadm:"
-kubeadm certs check-expiration
+sudo $(which kubeadm) certs check-expiration
