@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 
 check_ssl() {
-        echo $* | sed -e "s/ //g" | base64 -d | openssl x509 -noout -startdate -enddate -checkend 0 |   sed "s/Certificate will expire/ (EXPIRED\!)/g" |  sed "s/Certificate will not expire/ (OK)/g"
+        CERTIFICATE=$(echo $* | sed -e "s/ //g")
+	echo $CERTIFICATE | base64 -d  &> /dev/null || CERTIFICATE=$(base64 -w 0 $CERTIFICATE)
+        echo $CERTIFICATE | base64 -d  &> /dev/null || (echo "The certificate is damaged !!" && return 1)
+        if [ $? == 0 ] ; then echo $CERTIFICATE | base64 -d | openssl x509 -noout -startdate -enddate -checkend 0 | sed "s/Certificate will expire/ (EXPIRED\!)/g" | sed "s/Certificate will not expire/ (OK)/g"; fi
 }
 
 echo -e "\nChecking K8S certificates"
